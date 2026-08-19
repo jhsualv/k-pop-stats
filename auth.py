@@ -7,6 +7,10 @@ from urllib.parse import urlencode
 import requests
 from flask import Blueprint, redirect, session, request
 
+from crypto import encrypt
+from db import get_connection
+from queries import upsert_spotify_token, upsert_user
+
 from config import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI
 
 logger = logging.getLogger(__name__)
@@ -86,10 +90,40 @@ def callback():
         seconds=expires_in
     )
 
-    # TODO: Call Spotify /v1/me.
-    # TODO: Upsert the user into the database.
-    # TODO: Encrypt and store the refresh token.
-    # TODO: Store the internal user ID in the session.
-    # TODO: Redirect to the dashboard.
+    # Get the Spotify account information for the authenticated user.
+    me_response = requests.get(
+        "https://api.spotify.com/v1/me",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+        },
+        timeout=10,
+    )
+
+    if not me_response.ok:
+        logger.error(
+            "Spotify /v1/me failed: %s",
+            me_response.text,
+        )
+        return "Failed to retrieve Spotify user information", 400
+
+    spotify_user = me_response.json()
+
+    spotify_user_id = spotify_user.get("id")
+    display_name = spotify_user.get("display_name")
+
+    if not spotify_user_id:
+        logger.error("Spotify /v1/me response missing user ID: %s", spotify_user)
+        return "Invalid user response from Spotify", 400
+
+    # Encrypt and store the refresh token.
+    encrypted_refresh_token = encrypt(refresh_token)
+
+    # Upsert the user into the database.
+    with get_connection() as conn:
+        user_id = upsert_user(spotify_user_id, display_name, conn)
+        upsert_spotify_token(user_id, access_token, encrypted_refresh_token, expires_at, conn)
+
+    # Store the internal user ID in the session.
+    session["user_id"] = user_id
     
-    return f"Token expires at: {expires_at}"
+    return f"Successfully authenticated"
