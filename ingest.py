@@ -2,8 +2,8 @@
 import sys
 
 from db import get_connection
-from queries import  get_access_token, upsert_group, upsert_album, upsert_track
-from spotify import search_artist, get_artist, get_albums, get_album_tracks, get_tracks
+from queries import  get_access_token, upsert_group, upsert_album, upsert_track, upsert_savd_track, upsert_top_track
+from spotify import search_artist, get_artist, get_albums, get_album_tracks, get_tracks, get_saved_tracks, get_top_tracks
 
 def parse_release_date(album):
     """Return the release date of an album only when Spotify provides day-level precision."""
@@ -135,6 +135,27 @@ def ingest_tracks(token, spotify_album_id, album_id, group_id, conn):
         )
 
         print(f"  Ingested: {name} (ID: {track_id})")
+
+def ingest_listening(user_id, token, conn):
+    """Fetch listening history for a user and store it."""
+
+    # Ingest top tracks for all three Spotify time ranges.
+    for time_range in ("short_term", "medium_term", "long_term"):
+        tracks = get_top_tracks(token, time_range)
+
+        for position, track in enumerate(tracks, start=1):
+            upsert_top_track(user_id, track["id"], position, time_range, conn)
+        
+        print(f"Found {len(tracks)} {time_range} top tracks.")
+    
+    # Ingest the user's saved (liked) tracks.
+    saved_tracks = get_saved_tracks(token)
+
+    for saved in saved_tracks:
+        track = saved["track"]
+        upsert_saved_track(user_id, track["id"], saved["added_at"], conn)
+
+    print(f"Found {len(saved_tracks)} saved tracks.")
 
 def main():
     query = " ".join(sys.argv[1:])

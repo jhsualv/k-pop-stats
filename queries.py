@@ -92,6 +92,38 @@ def upsert_track(name, spotify_track_id, track_number, disc_number, album_id, gr
     )
     return rows[0]["id"]
 
+def upsert_top_track(user_id, spotify_track_id, position, time_range, conn):
+    """Insert or update the user's top tracks."""
+
+    execute_query(
+        """
+        INSERT INTO user_top_tracks (user_id, spotify_track_id, position, time_range, captured_on)
+        VALUES (%s, %s, %s, %s, CURRENT_DATE)
+        ON CONFLICT (user_id, time_range, captured_on, spotify_track_id) DO UPDATE SET
+            position = EXCLUDED.position;
+        """,
+        (user_id, spotify_track_id, position, time_range),
+        conn=conn,
+    )
+
+def upsert_saved_track(user_id, spotify_track_id, added_at, conn):
+    """Insert or update a user's saved track."""
+
+    execute_query(
+        """
+        INSERT INTO user_saved_tracks (
+            user_id,
+            spotify_track_id,
+            added_at,
+            captured_at
+        )
+        VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+        ON CONFLICT (user_id, spotify_track_id) DO UPDATE SET
+            captured_at = CURRENT_TIMESTAMP;
+        """,
+        (user_id, spotify_track_id, added_at),
+        conn=conn,
+    )
 
 def get_access_token(user_id, conn):
     """Return the stored Spotify access token for a user."""

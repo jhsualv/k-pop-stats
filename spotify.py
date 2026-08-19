@@ -15,6 +15,17 @@ def _get(token, path, params=None):
         timeout=10,
     )
 
+    # Check for rate limiting
+    if response.status_code == 429:
+        retry_after = response.headers.get("Retry-After")
+        error_data = response.json()
+
+        if error_data.get("error", {}).get("reason") == "QUOTA_EXCEEDED":
+            raise RuntimeError(
+                f"Spotify development quota exceeded. "
+                f"Retry after approximately {retry_after} seconds."
+            )
+
     response.raise_for_status()
     return response.json()
 
@@ -103,4 +114,57 @@ def get_tracks(token, track_ids):
 
         tracks.append(track)
 
+    return tracks
+
+def get_top_tracks(token, time_range):
+    """Return the user's top tracks for a given time range.
+    
+    time_range: short_term, medium_term, long_term"""
+    
+    tracks = []
+    params = {
+        "time_range": time_range,
+        "limit": 50,
+        "offset": 0,
+    }
+
+    while True:
+        data = _get(
+            token,
+            "/me/top/tracks",
+            params=params
+        )
+
+        tracks.extend(data["items"])
+
+        if not data.get("next"):
+            break
+            
+        params["offset"] += params["limit"]
+    
+    return tracks
+
+def get_saved_tracks(token):
+    """Return the user's saved tracks."""
+    
+    tracks = []
+    params = {
+        "limit": 50,
+        "offset": 0,
+    }
+
+    while True:
+        data = _get(
+            token,
+            "/me/tracks",
+            params=params
+        )
+
+        tracks.extend(data["items"])
+
+        if not data.get("next"):
+            break
+            
+        params["offset"] += params["limit"]
+    
     return tracks
