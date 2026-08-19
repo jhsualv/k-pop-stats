@@ -70,6 +70,29 @@ def upsert_album(name, spotify_album_id, album_type, group_id, release_date, ima
     )
     return rows[0]["id"]
 
+def upsert_track(name, spotify_track_id, track_number, disc_number, album_id, group_id, isrc, duration_ms, conn):
+    """Insert or update a track and return the internal track ID."""
+
+    rows = fetch_all(
+        """
+        INSERT INTO tracks (name, spotify_track_id, track_number, disc_number, album_id, group_id, isrc, duration_ms)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (spotify_track_id) DO UPDATE SET
+            name = EXCLUDED.name,
+            track_number = EXCLUDED.track_number,
+            disc_number = EXCLUDED.disc_number,
+            album_id = EXCLUDED.album_id,
+            group_id = EXCLUDED.group_id,
+            isrc = EXCLUDED.isrc,
+            duration_ms = EXCLUDED.duration_ms
+        RETURNING id;
+        """,
+        (name, spotify_track_id, track_number, disc_number, album_id, group_id, isrc, duration_ms),
+        conn=conn,
+    )
+    return rows[0]["id"]
+
+
 def get_access_token(user_id, conn):
     """Return the stored Spotify access token for a user."""
 

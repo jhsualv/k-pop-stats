@@ -2,7 +2,7 @@
 import sys
 
 from db import get_connection
-from queries import  get_access_token, upsert_group, upsert_album
+from queries import  get_access_token, upsert_group, upsert_album, upsert_track
 from spotify import search_artist, get_artist, get_albums, get_album_tracks, get_tracks
 
 def parse_release_date(album):
@@ -95,6 +95,46 @@ def ingest_albums(token, spotify_artist_id, group_id, conn):
         )
 
         print(f"  Ingested: {name} (ID: {album_id})")
+
+        ingest_tracks(
+            token,
+            spotify_album_id,
+            album_id,
+            group_id,
+            conn,
+        )
+
+def ingest_tracks(token, spotify_album_id, album_id, group_id, conn):
+    """Fetch tracks for an album and store them."""
+    simple_tracks = get_album_tracks(token, spotify_album_id)
+
+    track_ids = [track["id"] for track in simple_tracks]
+
+    full_tracks = get_tracks(token, track_ids)
+
+    for track in full_tracks:
+        external_ids = track.get("external_ids") or {}
+        isrc = external_ids.get("isrc")
+
+        name = track["name"]
+        spotify_track_id = track["id"]
+        track_number = track["track_number"]
+        disc_number = track["disc_number"]
+        duration_ms = track["duration_ms"]
+        
+        track_id = upsert_track(
+            name,
+            spotify_track_id,
+            track_number,
+            disc_number,
+            album_id,
+            group_id,
+            isrc,
+            duration_ms,
+            conn,
+        )
+
+        print(f"  Ingested: {name} (ID: {track_id})")
 
 def main():
     query = " ".join(sys.argv[1:])

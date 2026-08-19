@@ -35,8 +35,6 @@ CREATE TABLE tracks (
 id SERIAL PRIMARY KEY,
 name TEXT NOT NULL,
 spotify_track_id TEXT UNIQUE NOT NULL,
-popularity INTEGER,
-popularity_captured_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 track_number INTEGER,
 disc_number INTEGER,
 album_id INTEGER NOT NULL REFERENCES albums(id),
@@ -73,7 +71,7 @@ PRIMARY KEY (user_id, spotify_track_id)
 CREATE TABLE spotify_tokens (
 user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
 access_token TEXT,
-refresh_token_encrypted TEXT NOT NULL, -- TODO: implement encryption for stored refresh token
+refresh_token_encrypted TEXT NOT NULL,
 expires_at TIMESTAMPTZ NOT NULL,
 created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP

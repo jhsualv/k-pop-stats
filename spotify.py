@@ -14,6 +14,7 @@ def _get(token, path, params=None):
         params=params,
         timeout=10,
     )
+
     response.raise_for_status()
     return response.json()
 
@@ -90,21 +91,16 @@ def get_album_tracks(token, album_id):
 
 
 def get_tracks(token, track_ids):
-    """Return full Spotify track objects in batches of up to 50."""
+    """Return full Spotify track objects for the given track IDs."""
 
     tracks = []
 
-    for i in range(0, len(track_ids), 50):
-        batch = track_ids[i:i + 50]
-
-        data = _get(
+    for track_id in track_ids:
+        track = _get(
             token,
-            "/tracks",
-            params={
-                "ids": ",".join(batch),
-            },
+            f"/tracks/{track_id}",
         )
 
-        tracks.extend(data["tracks"])
+        tracks.append(track)
 
     return tracks
