@@ -21,6 +21,9 @@ DATABASE_URL = required_env("DATABASE_URL")
 # Encryption configuration
 ENCRYPTION_KEY = required_env("TOKEN_ENCRYPTION_KEY")
 
+# Flask configuration
+FLASK_SECRET_KEY = required_env("FLASK_SECRET_KEY")
+
 # Spotify OAuth configuration
 SPOTIFY_CLIENT_ID = required_env("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = required_env("SPOTIFY_CLIENT_SECRET")
