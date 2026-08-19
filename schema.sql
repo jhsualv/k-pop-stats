@@ -27,7 +27,8 @@ spotify_album_id TEXT UNIQUE NOT NULL,
 album_type TEXT,
 era_id INTEGER REFERENCES eras(id),
 group_id INTEGER NOT NULL REFERENCES groups(id),
-release_date DATE
+release_date DATE,
+image_url TEXT
 );
 
 CREATE TABLE tracks (
@@ -47,6 +48,7 @@ duration_ms INTEGER
 CREATE TABLE users (
 id SERIAL PRIMARY KEY,
 spotify_user_id TEXT UNIQUE NOT NULL,
+image_url TEXT,
 display_name TEXT,
 created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

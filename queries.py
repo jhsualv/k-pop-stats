@@ -32,3 +32,58 @@ def upsert_spotify_token(user_id, access_token, refresh_token_encrypted, expires
         (user_id, access_token, refresh_token_encrypted, expires_at),
         conn=conn,
     )
+
+def upsert_group(name, spotify_artist_id, profile_image, conn):
+    """Insert or update a group and return the internal group ID."""
+
+    rows = fetch_all(
+        """
+        INSERT INTO groups (name, spotify_artist_id, profile_image)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (spotify_artist_id) DO UPDATE SET
+            name = EXCLUDED.name,
+            profile_image = EXCLUDED.profile_image
+        RETURNING id;
+        """,
+        (name, spotify_artist_id, profile_image),
+        conn=conn,
+    )
+    return rows[0]["id"]
+
+def upsert_album(name, spotify_album_id, album_type, group_id, release_date, image_url, conn):
+    """Insert or update an album and return the internal album ID."""
+
+    rows = fetch_all(
+        """
+        INSERT INTO albums (name, spotify_album_id, album_type, group_id, release_date, image_url)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (spotify_album_id) DO UPDATE SET
+            name = EXCLUDED.name,
+            album_type = EXCLUDED.album_type,
+            group_id = EXCLUDED.group_id,
+            release_date = EXCLUDED.release_date,
+            image_url = EXCLUDED.image_url
+        RETURNING id;
+        """,
+        (name, spotify_album_id, album_type, group_id, release_date, image_url),
+        conn=conn,
+    )
+    return rows[0]["id"]
+
+def get_access_token(user_id, conn):
+    """Return the stored Spotify access token for a user."""
+
+    rows = fetch_all(
+        """
+        SELECT access_token
+        FROM spotify_tokens
+        WHERE user_id = %s
+        """,
+        (user_id,),
+        conn=conn,
+    )
+
+    if not rows:
+        raise ValueError("No Spotify token found for user")
+
+    return rows[0]["access_token"]

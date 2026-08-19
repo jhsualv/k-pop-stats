@@ -126,4 +126,4 @@ def callback():
     # Store the internal user ID in the session.
     session["user_id"] = user_id
     
-    return f"Successfully authenticated"
+    return "Successfully authenticated"
