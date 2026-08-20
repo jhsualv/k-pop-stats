@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,13 +10,17 @@
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}"
+  >
 </head>
 
 <body>
 
-{% set current = analysis[time_range] %}
   <div class="halftone-bg"></div>
+
+  {% set current = analysis[time_range] %}
 
   <div id="app">
     <div class="layout">
@@ -26,18 +29,18 @@
       <div class="sidebar">
 
         <!-- Spotify profile -->
-        {% if profile.image_url %}
-            <img
-                src="{{ profile.image_url }}"
-                class="profile-img"
-                alt="Spotify profile"
-            >
+        {% if profile.profile_image %}
+          <img
+            src="{{ profile.profile_image }}"
+            class="profile-img"
+            alt="Spotify profile"
+          >
         {% else %}
-            <div class="profile-img profile-placeholder"></div>
+          <div class="profile-img profile-placeholder"></div>
         {% endif %}
 
         <p class="profile-name">
-            {{ profile.display_name or profile.spotify_user_id }}
+          {{ profile.display_name or profile.spotify_user_id }}
         </p>
 
         <div class="profile-stats">
@@ -81,72 +84,188 @@
           <div class="stat-row">
             <span class="stat-label">time range</span>
             <span class="stat-value">
-                {% if time_range == "short_term" %}
-                    4 weeks
-                {% elif time_range == "medium_term" %}
-                    6 months
-                {% else %}
-                    1 year
-                {% endif %}
+              {% if time_range == "short_term" %}
+                4 weeks
+              {% elif time_range == "medium_term" %}
+                6 months
+              {% else %}
+                1 year
+              {% endif %}
             </span>
           </div>
 
         </div>
       </div>
 
+
       <!-- Main content -->
       <div class="main">
 
-        <!-- Controls -->
+        <!-- Time range controls -->
         <div class="controls">
+
           <div class="tab-group">
 
             <a
-                href="{{ url_for('home', time_range='short_term') }}"
-                class="tab {% if time_range == 'short_term' %}active{% endif %}"
+              class="tab {% if time_range == 'short_term' %}active{% endif %}"
+              href="{{ url_for('home', time_range='short_term') }}"
             >
-            4 weeks
+              4 weeks
             </a>
 
             <a
-                href="{{ url_for('home', time_range='medium_term') }}"
-                class="tab {% if time_range == 'medium_term' %}active{% endif %}"
+              class="tab {% if time_range == 'medium_term' %}active{% endif %}"
+              href="{{ url_for('home', time_range='medium_term') }}"
             >
-            6 months
+              6 months
             </a>
 
             <a
-                href="{{ url_for('home', time_range='long_term') }}"
-                class="tab {% if time_range == 'long_term' %}active{% endif %}"
+              class="tab {% if time_range == 'long_term' %}active{% endif %}"
+              href="{{ url_for('home', time_range='long_term') }}"
             >
-            1 year
+              1 year
             </a>
 
           </div>
+
         </div>
 
-        <!-- Group cards -->
+
+        <!-- Group cards / expanded group -->
         <div id="group-cards">
 
-          {% if current.groups %}
+          <!-- Find the selected group, if one was requested -->
+          {% set selected = namespace(group=None) %}
+
+          {% if selected_group %}
+            {% for group in current.groups %}
+              {% if group.group_id == selected_group %}
+                {% set selected.group = group %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+
+          {% if selected.group %}
+
+            <!-- Expanded group view -->
+            <div class="expanded-card">
+
+              <div class="expanded-group">
+
+                <div class="expanded-group-header">
+
+                  <div class="rank-label">
+                    #{{ current.groups.index(selected.group) + 1 }}
+                  </div>
+
+                  {% if selected.group.profile_image %}
+                    <img
+                      src="{{ selected.group.profile_image }}"
+                      class="artist-img"
+                      alt="{{ selected.group.group_name }}"
+                    >
+                  {% else %}
+                    <div class="artist-img artist-placeholder"></div>
+                  {% endif %}
+
+                  <div>
+
+                    <div class="expanded-group-name">
+                      {{ selected.group.group_name }}
+                    </div>
+
+                    <div class="expanded-group-track">
+                      fav song:
+                      {{ selected.group.top_track.name
+                         if selected.group.top_track
+                         else "—" }}
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <!-- Era breakdown -->
+                <div class="era-bars">
+
+                  {% for era in selected.group.eras %}
+
+                    <div class="era-bar-row">
+
+                      <div class="era-bar-label">
+                        {{ era.era }}
+                      </div>
+
+                      <div class="era-bar-track">
+
+                        <div
+  class="era-bar-fill"
+  style="width: {{ era.bar_width }}%;"
+></div>
+
+                      </div>
+
+                      <div class="era-score">
+                        {{ "%.3f"|format(era.affinity_score) }}
+                      </div>
+
+                    </div>
+
+                  {% endfor %}
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- Back button -->
+            <a
+              href="{{ url_for('home', time_range=time_range) }}"
+              class="back-btn"
+            >
+              ← back to groups
+            </a>
+
+
+          {% elif current.groups %}
+
+            <!-- Normal group ranking -->
 
             {% for group in current.groups %}
 
-              <div class="group-card">
+              <a
+                href="{{ url_for(
+                  'home',
+                  time_range=time_range,
+                  group=group.group_id
+                ) }}"
+                class="group-card"
+              >
 
                 <div class="rank-label">
                   #{{ loop.index }}
                 </div>
 
+
                 {% if group.profile_image %}
-                    <img
-                        class="artist-img"
-                        src="{{ group.profile_image }}"
-                        alt="{{ group.group_name }}"
-                    >
+
+                  <img
+                    class="artist-img"
+                    src="{{ group.profile_image }}"
+                    alt="{{ group.group_name }}"
+                  >
+
                 {% else %}
-                    <div class="artist-img artist-placeholder"></div>
+
+                  <div class="artist-img artist-placeholder"></div>
+
                 {% endif %}
+
 
                 <div class="group-info">
 
@@ -174,13 +293,21 @@
 
                 </div>
 
-              </div>
+              </a>
 
             {% endfor %}
 
+
           {% else %}
 
-            <p style="font-family:'Gaegu',cursive;color:var(--blue);font-size:1.2rem;padding:16px;">
+            <p
+              style="
+                font-family:'Gaegu',cursive;
+                color:var(--blue);
+                font-size:1.2rem;
+                padding:16px;
+              "
+            >
               no matching groups found
             </p>
 
@@ -188,15 +315,18 @@
 
         </div>
 
+
         <!-- Recommendation placeholder -->
-        <div class="recs-card">
-          <p>b-side recommender — coming soon</p>
-        </div>
+        {% if not selected.group %}
+          <div class="recs-card">
+            <p>b-side recommender — coming soon</p>
+          </div>
+        {% endif %}
 
       </div>
+
     </div>
   </div>
 
 </body>
 </html>
-```

@@ -200,6 +200,16 @@ def get_group_analysis(user_id, time_range, conn):
         reverse=True,
     )
 
+    for group in results:
+        max_score = group["eras"][0]["affinity_score"] if group["eras"] else 1
+
+        for era in group["eras"]:
+            era["bar_width"] = (
+                era["affinity_score"] / max_score * 100
+                if max_score
+                else 0
+            )
+
     return results
 
 def get_user_analysis(user_id, conn):

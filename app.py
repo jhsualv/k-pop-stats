@@ -21,6 +21,7 @@ def home():
         return redirect("/login")
 
     time_range = request.args.get("time_range", "short_term")
+    selected_group = request.args.get("group", type=int)
 
     if time_range not in ("short_term", "medium_term", "long_term"):
         time_range = "short_term"
@@ -34,6 +35,7 @@ def home():
         analysis=analysis,
         profile=profile,
         time_range=time_range,
+        selected_group=selected_group,
     )
 
 @app.route("/ingest/listening")
