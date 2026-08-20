@@ -110,6 +110,11 @@ def callback():
 
     spotify_user_id = spotify_user.get("id")
     display_name = spotify_user.get("display_name")
+    image_url = (
+        spotify_user.get("images", [{}])[0].get("url")
+        if spotify_user.get("images")
+        else None
+    )
 
     if not spotify_user_id:
         logger.error("Spotify /v1/me response missing user ID: %s", spotify_user)
@@ -120,10 +125,10 @@ def callback():
 
     # Upsert the user into the database.
     with get_connection() as conn:
-        user_id = upsert_user(spotify_user_id, display_name, conn)
+        user_id = upsert_user(spotify_user_id, display_name, image_url, conn)
         upsert_spotify_token(user_id, access_token, encrypted_refresh_token, expires_at, conn)
 
     # Store the internal user ID in the session.
     session["user_id"] = user_id
     
-    return f"Successfully authenticated"
+    return redirect("/")

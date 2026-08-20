@@ -1,0 +1,438 @@
+/* ── reset & base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:   #2B4A6B;
+  --blue:   #7BA7C7;
+  --light:  #D6E4F0;
+  --paper:  #EEF3F9;
+  --white:  #FFFFFF;
+  --dot-color: #6B95C4;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--navy);
+  min-height: 100vh;
+}
+
+/* ── halftone header background ── */
+.halftone-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 52vh;
+  background-color: #C8D9EE;
+  background-image: 
+    radial-gradient(circle, var(--dot-color) 1.8px, transparent 1.8px),
+    radial-gradient(circle, var(--dot-color) 1.8px, transparent 1.8px);
+  background-size: 12px 12px;
+  background-position: 0 0, 6px 6px;
+  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── login screen ── */
+#login-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+#login-screen h1 {
+  font-family: 'Gaegu', cursive;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+#login-screen p {
+  color: var(--blue);
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.login-btn {
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  padding: 14px 32px;
+  border-radius: 999px;
+  font-family: 'Gaegu', cursive;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.login-btn:hover { background: var(--blue); }
+
+/* ── main app layout ── */
+#app {
+  display: block;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.layout {
+  display: flex;
+  gap: 24px;
+  padding: 32px 32px 32px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── sidebar ── */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  border: 1px solid var(--light);
+  align-self: flex-start;
+  position: sticky;
+  top: 32px;
+}
+
+.profile-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--white);
+  box-shadow: 0 4px 16px rgba(43,74,107,0.15);
+  margin-bottom: 16px;
+  background: var(--light);
+}
+
+.profile-name {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--navy);
+  text-align: center;
+}
+
+/* ── main content ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── controls bar ── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  border: 1px solid var(--light);
+  padding: 12px 16px;
+}
+
+.tab-group {
+  display: flex;
+  gap: 4px;
+  background: var(--light);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.tab {
+  font-family: 'Gaegu', cursive;
+  font-size: 1rem;
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--navy);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tab.active {
+  background: var(--white);
+  color: var(--navy);
+  box-shadow: 0 1px 4px rgba(43,74,107,0.12);
+}
+
+.controls-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--light);
+  margin: 0 4px;
+}
+
+.songs-select {
+  font-family: 'Gaegu', cursive;
+  font-size: 1rem;
+  padding: 6px 12px;
+  border: 1px solid var(--light);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  outline: none;
+}
+
+/* ── group cards ── */
+.group-card {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--light);
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: box-shadow 0.2s;
+}
+
+.group-card:hover {
+  box-shadow: 0 4px 20px rgba(43,74,107,0.1);
+}
+
+#group-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rank-label {
+  font-family: 'Gaegu', cursive;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--blue);
+  width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.artist-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--light);
+  background: var(--light);
+  flex-shrink: 0;
+}
+
+.group-info {
+  flex: 1;
+}
+
+.group-name {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.1;
+}
+
+.fav-era {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.1rem;
+  color: var(--blue);
+  margin-top: 4px;
+}
+
+.fav-era span {
+  color: var(--navy);
+  font-weight: 700;
+}
+
+/* ── recs card ── */
+.recs-card {
+  background: rgba(255,255,255,0.6);
+  border: 1.5px dashed var(--blue);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.recs-card:hover { background: rgba(255,255,255,0.9); }
+
+.recs-card p {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.3rem;
+  color: var(--blue);
+}
+
+/* ── loading state ── */
+#loading {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+#loading p {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.4rem;
+  color: var(--navy);
+  margin-top: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--light);
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.profile-stats {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--light);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.1rem;
+  color: var(--navy);
+}
+
+.stat-value {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.05rem;
+  color: var(--blue);
+  word-break: break-word;
+}
+
+/* ── expanded view ── */
+.expanded-card {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--light);
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.expanded-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.expanded-group-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.expanded-group-header .artist-img {
+  width: 48px;
+  height: 48px;
+}
+
+.expanded-group-name {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.expanded-group-track {
+  font-family: 'Gaegu', cursive;
+  font-size: 0.95rem;
+  color: var(--blue);
+}
+
+.era-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 62px;
+}
+
+.era-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.era-bar-label {
+  font-family: 'Gaegu', cursive;
+  font-size: 0.9rem;
+  color: var(--navy);
+  width: 140px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.era-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--light);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.era-bar-fill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.back-btn {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.1rem;
+  color: var(--blue);
+  background: none;
+  border: 1.5px dashed var(--blue);
+  border-radius: 16px;
+  padding: 16px 24px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: rgba(255,255,255,0.9);
+}

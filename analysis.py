@@ -9,6 +9,8 @@ def get_era_affinity(user_id, time_range, conn):
         SELECT
             e.id AS era_id,
             e.name AS era,
+            e.group_id,
+            g.name AS group_name,
             SUM(1.0 / utt.position) AS affinity_score
         FROM user_top_tracks utt
         JOIN tracks t
@@ -17,9 +19,11 @@ def get_era_affinity(user_id, time_range, conn):
             ON t.album_id = a.id
         JOIN eras e
             ON a.era_id = e.id
+        JOIN groups g
+            ON e.group_id = g.id
         WHERE utt.user_id = %s
           AND utt.time_range = %s
-        GROUP BY e.id, e.name
+        GROUP BY e.id, e.name, e.group_id, g.name
         ORDER BY affinity_score DESC;
         """,
         (user_id, time_range),
@@ -138,13 +142,96 @@ def get_era_coverage(user_id, time_range, conn):
         conn=conn,
     )
 
-if __name__ == "__main__":
-    with get_connection() as conn:
-        results = get_era_coverage(
-            1,
-            "long_term",
+def get_top_track_for_group(user_id, group_id, time_range, conn):
+    """Return the user's highest-ranked track from a group."""
+
+    rows = fetch_all(
+        """
+        SELECT
+            t.name,
+            t.spotify_track_id,
+            utt.position
+        FROM user_top_tracks utt
+        JOIN tracks t
+            ON utt.spotify_track_id = t.spotify_track_id
+        JOIN albums a
+            ON t.album_id = a.id
+        JOIN eras e
+            ON a.era_id = e.id
+        WHERE utt.user_id = %s
+          AND utt.time_range = %s
+          AND e.group_id = %s
+        ORDER BY utt.position
+        LIMIT 1;
+        """,
+        (user_id, time_range, group_id),
+        conn=conn,
+    )
+
+    return rows[0] if rows else None
+
+def get_group_analysis(user_id, time_range, conn):
+    """Rank groups by the combined affinity of their eras."""
+
+    era_affinity = get_era_affinity(user_id, time_range, conn)
+
+    groups = {}
+
+    for era in era_affinity:
+        group_id = era["group_id"]
+
+        if group_id not in groups:
+            groups[group_id] = {
+                "group_id": group_id,
+                "group_name": era["group_name"],
+                "score": 0,
+                "eras": [],
+            }
+
+        groups[group_id]["score"] += era["affinity_score"]
+        groups[group_id]["eras"].append(era)
+
+    results = list(groups.values())
+
+    results.sort(
+        key=lambda group: group["score"],
+        reverse=True,
+    )
+
+    return results
+
+def get_user_analysis(user_id, conn):
+    """Build the listening analysis for the logged-in user."""
+
+    analysis = {}
+
+    for time_range in ("short_term", "medium_term", "long_term"):
+
+        groups = get_group_analysis(
+            user_id,
+            time_range,
             conn,
         )
 
-        for row in results:
-            print(row)
+        for group in groups:
+            group["top_era"] = (
+                group["eras"][0]
+                if group["eras"]
+                else None
+            )
+
+            group["top_track"] = get_top_track_for_group(
+                user_id,
+                group["group_id"],
+                time_range,
+                conn,
+            )
+
+        analysis[time_range] = {
+            "groups": groups,
+            "top_groups": groups[:5],
+            "top_group": groups[0] if groups else None,
+        }
+
+    return analysis
+        

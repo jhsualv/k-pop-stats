@@ -1,18 +1,19 @@
 # queries.py
 from db import fetch_all, execute
 
-def upsert_user(spotify_user_id, display_name, conn):
+def upsert_user(spotify_user_id, display_name, image_url, conn):
     """Insert or update a Spotify user and return the internal user ID."""
 
     rows = fetch_all(
         """
-        INSERT INTO users (spotify_user_id, display_name)
-        VALUES (%s, %s)
+        INSERT INTO users (spotify_user_id, display_name, image_url)
+        VALUES (%s, %s, %s)
         ON CONFLICT (spotify_user_id) DO UPDATE SET
-            display_name = EXCLUDED.display_name
+            display_name = EXCLUDED.display_name,
+            image_url = EXCLUDED.image_url
         RETURNING id;
         """,
-        (spotify_user_id, display_name),
+        (spotify_user_id, display_name, image_url),
         conn=conn,
     )
     return rows[0]["id"]
@@ -142,3 +143,21 @@ def get_access_token(user_id, conn):
         raise ValueError("No Spotify token found for user")
 
     return rows[0]["access_token"]
+
+def get_user(user_id, conn):
+    """Return the user's Spotify profile information."""
+    rows = fetch_all(
+        """
+        SELECT
+            id,
+            spotify_user_id,
+            display_name,
+            image_url
+        FROM users
+        WHERE id = %s;
+        """,
+        (user_id,),
+        conn=conn,
+    )
+
+    return rows[0] if rows else None
