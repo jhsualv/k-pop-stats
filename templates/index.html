@@ -120,7 +120,15 @@
                   #{{ loop.index }}
                 </div>
 
-                <div class="artist-img artist-placeholder"></div>
+                {% if group.profile_image %}
+                    <img
+                        class="artist-img"
+                        src="{{ group.profile_image }}"
+                        alt="{{ group.group_name }}"
+                    >
+                {% else %}
+                    <div class="artist-img artist-placeholder"></div>
+                {% endif %}
 
                 <div class="group-info">
 

@@ -11,6 +11,7 @@ def get_era_affinity(user_id, time_range, conn):
             e.name AS era,
             e.group_id,
             g.name AS group_name,
+            g.profile_image,
             SUM(1.0 / utt.position) AS affinity_score
         FROM user_top_tracks utt
         JOIN tracks t
@@ -23,7 +24,7 @@ def get_era_affinity(user_id, time_range, conn):
             ON e.group_id = g.id
         WHERE utt.user_id = %s
           AND utt.time_range = %s
-        GROUP BY e.id, e.name, e.group_id, g.name
+        GROUP BY e.id, e.name, g.id, g.name, g.profile_image
         ORDER BY affinity_score DESC;
         """,
         (user_id, time_range),
@@ -184,6 +185,7 @@ def get_group_analysis(user_id, time_range, conn):
             groups[group_id] = {
                 "group_id": group_id,
                 "group_name": era["group_name"],
+                "profile_image": era["profile_image"],
                 "score": 0,
                 "eras": [],
             }
