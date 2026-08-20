@@ -1,8 +1,11 @@
--- Catalog tables are rebuilt from Spotify while user tables persist
+DROP TABLE IF EXISTS user_saved_tracks;
+DROP TABLE IF EXISTS user_top_tracks;
+DROP TABLE IF EXISTS spotify_tokens;
 DROP TABLE IF EXISTS tracks;
 DROP TABLE IF EXISTS albums;
 DROP TABLE IF EXISTS eras;
 DROP TABLE IF EXISTS groups;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE groups (
 id SERIAL PRIMARY KEY,

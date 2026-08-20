@@ -95,7 +95,7 @@ def upsert_track(name, spotify_track_id, track_number, disc_number, album_id, gr
 def upsert_top_track(user_id, spotify_track_id, position, time_range, conn):
     """Insert or update the user's top tracks."""
 
-    execute_query(
+    execute(
         """
         INSERT INTO user_top_tracks (user_id, spotify_track_id, position, time_range, captured_on)
         VALUES (%s, %s, %s, %s, CURRENT_DATE)
@@ -109,7 +109,7 @@ def upsert_top_track(user_id, spotify_track_id, position, time_range, conn):
 def upsert_saved_track(user_id, spotify_track_id, added_at, conn):
     """Insert or update a user's saved track."""
 
-    execute_query(
+    execute(
         """
         INSERT INTO user_saved_tracks (
             user_id,

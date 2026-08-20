@@ -2,7 +2,7 @@
 import sys
 
 from db import get_connection
-from queries import  get_access_token, upsert_group, upsert_album, upsert_track, upsert_savd_track, upsert_top_track
+from queries import  get_access_token, upsert_group, upsert_album, upsert_track, upsert_saved_track, upsert_top_track
 from spotify import search_artist, get_artist, get_albums, get_album_tracks, get_tracks, get_saved_tracks, get_top_tracks
 
 def parse_release_date(album):
