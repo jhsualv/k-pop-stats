@@ -525,3 +525,27 @@ body {
   background: rgba(255,255,255,0.9);
   color: var(--navy);
 }
+
+.logout-btn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: center;
+
+  font-family: 'Gaegu', cursive;
+  font-size: 1rem;
+  color: var(--blue);
+
+  background: transparent;
+  border: 1px dashed var(--blue);
+  border-radius: 8px;
+
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.logout-btn:hover {
+  background: var(--light);
+  color: var(--navy);
+}

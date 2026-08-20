@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
 import requests
-from flask import Blueprint, redirect, session, request
+from flask import Blueprint, redirect, session, request, render_template
 
 from crypto import encrypt
 from db import get_connection
@@ -17,8 +17,14 @@ logger = logging.getLogger(__name__)
 
 auth = Blueprint("auth", __name__)
 
+
 @auth.route("/login")
 def login():
+    """Display the login page."""
+    return render_template("login.html")
+
+@auth.route("/authorize")
+def authorize():
     """Redirect the user to Spotify's authorization page."""
 
     state = secrets.token_urlsafe(32)
@@ -34,6 +40,13 @@ def login():
     
     auth_url = "https://accounts.spotify.com/authorize?" + urlencode(params)
     return redirect(auth_url)
+
+
+@auth.route("/logout")
+def logout():
+    """Log the user out by clearing the session."""
+    session.clear()
+    return redirect("/login")
 
 @auth.route("/callback")
 def callback():
