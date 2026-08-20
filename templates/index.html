@@ -29,9 +29,9 @@
       <div class="sidebar">
 
         <!-- Spotify profile -->
-        {% if profile.profile_image %}
+        {% if profile.image_url %}
           <img
-            src="{{ profile.profile_image }}"
+            src="{{ profile.image_url }}"
             class="profile-img"
             alt="Spotify profile"
           >
@@ -152,83 +152,121 @@
             <!-- Expanded group view -->
             <div class="expanded-card">
 
-              <div class="expanded-group">
+                <div class="expanded-header">
 
-                <div class="expanded-group-header">
+                    <div class="expanded-header-main">
 
-                  <div class="rank-label">
-                    #{{ current.groups.index(selected.group) + 1 }}
-                  </div>
+                        <div class="rank-label">
+                            #{{ current.groups.index(selected.group) + 1 }}
+                        </div>
 
-                  {% if selected.group.profile_image %}
-                    <img
-                      src="{{ selected.group.profile_image }}"
-                      class="artist-img"
-                      alt="{{ selected.group.group_name }}"
-                    >
-                  {% else %}
-                    <div class="artist-img artist-placeholder"></div>
-                  {% endif %}
+                        {% if selected.group.profile_image %}
+                            <img
+                            src="{{ selected.group.profile_image }}"
+                            class="expanded-artist-img"
+                            alt="{{ selected.group.group_name }}"
+                            >
+                        {% else %}
+                            <div class="expanded-artist-img artist-placeholder"></div>
+                        {% endif %}
 
-                  <div>
+                        <div class="expanded-title">
 
-                    <div class="expanded-group-name">
-                      {{ selected.group.group_name }}
+                            <div class="expanded-group-name">
+                                {{ selected.group.group_name }}
+                            </div>
+
+                            <div class="expanded-group-track">
+                                favorite song:
+                                <span>
+                                    {{ selected.group.top_track.name
+                                    if selected.group.top_track
+                                    else "—" }}
+                                </span>
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    <div class="expanded-group-track">
-                      fav song:
-                      {{ selected.group.top_track.name
-                         if selected.group.top_track
-                         else "—" }}
-                    </div>
+                    {% if selected.group.top_era %}
+                    <div class="expanded-favorite-era">
 
-                  </div>
+                        <div class="expanded-favorite-label">
+                            favorite era
+                        </div>
+
+                        <div class="expanded-favorite-name">
+                            {{ selected.group.top_era.era }}
+                        </div>
+
+                    </div>
+                    {% endif %}
 
                 </div>
 
 
-                <!-- Era breakdown -->
-                <div class="era-bars">
+                <div class="era-section">
 
-                  {% for era in selected.group.eras %}
+                    <div class="era-section-title">
+                        era breakdown
+                    </div>
 
-                    <div class="era-bar-row">
+                    <div class="era-section-subtitle">
+                        your listening affinity for {{ selected.group.group_name }}
+                    </div>
 
-                      <div class="era-bar-label">
-                        {{ era.era }}
-                      </div>
+                    <!-- Era bars -->
+                    <div class="era-bars">
 
-                      <div class="era-bar-track">
+                        {% for era in selected.group.eras %}
 
-                        <div
-  class="era-bar-fill"
-  style="width: {{ era.bar_width }}%;"
-></div>
+                            <div class="era-bar-row">
 
-                      </div>
+                            <div class="era-bar-info">
 
-                      <div class="era-score">
-                        {{ "%.3f"|format(era.affinity_score) }}
-                      </div>
+                                <div class="era-bar-label">
+                                    {{ era.era }}
+                                </div>
+
+                                {% if loop.first %}
+                                    <div class="era-bar-favorite">
+                                        favorite
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                            <div class="era-bar-track">
+
+                                <div
+                                    class="era-bar-fill {% if loop.first %}era-bar-fill-top{% endif %}"
+                                    style="width: {{ era.bar_width }}%;"
+                                ></div>
+
+                            </div>
+
+                            <div class="era-score">
+                                {{ "%.3f"|format(era.affinity_score)}}
+                            </div>
+
+                            </div>
+
+                        {% endfor %}
 
                     </div>
 
-                  {% endfor %}
-
                 </div>
-
-              </div>
 
             </div>
 
 
             <!-- Back button -->
             <a
-              href="{{ url_for('home', time_range=time_range) }}"
-              class="back-btn"
+                href="{{ url_for('home', time_range=time_range) }}"
+                class="back-btn"
             >
-              ← back to groups
+                ← back to groups
             </a>
 
 

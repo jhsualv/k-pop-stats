@@ -349,69 +349,137 @@ body {
   backdrop-filter: blur(8px);
   border: 1px solid var(--light);
   border-radius: 16px;
-  padding: 20px 24px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
 }
 
-.expanded-group {
+.expanded-header {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--light);
 }
 
-.expanded-group-header {
+.expanded-header-main {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
-.expanded-group-header .artist-img {
-  width: 48px;
-  height: 48px;
+.expanded-artist-img {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--light);
+  background: var(--light);
+  flex-shrink: 0;
+}
+
+.expanded-title {
+  min-width: 0;
 }
 
 .expanded-group-name {
   font-family: 'Gaegu', cursive;
-  font-size: 1.3rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--navy);
+  line-height: 1.1;
 }
 
 .expanded-group-track {
+  font-family: 'Gaegu', cursive;
+  font-size: 1rem;
+  color: var(--blue);
+  margin-top: 6px;
+}
+
+.expanded-group-track span {
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.expanded-favorite-era {
+  background: var(--paper);
+  border: 1px solid var(--light);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.expanded-favorite-label {
   font-family: 'Gaegu', cursive;
   font-size: 0.95rem;
   color: var(--blue);
 }
 
+.expanded-favorite-name {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-top: 2px;
+}
+
+.era-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.era-section-title {
+  font-family: 'Gaegu', cursive;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.era-section-subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  color: var(--blue);
+  margin-bottom: 16px;
+}
+
 .era-bars {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-left: 62px;
+  gap: 12px;
 }
 
 .era-bar-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+.era-bar-info {
+  width: 150px;
+  flex-shrink: 0;
 }
 
 .era-bar-label {
   font-family: 'Gaegu', cursive;
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--navy);
-  width: 140px;
-  flex-shrink: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.era-bar-favorite {
+  font-family: 'Gaegu', cursive;
+  font-size: 0.8rem;
+  color: var(--blue);
+  margin-top: -2px;
+}
+
 .era-bar-track {
   flex: 1;
-  height: 8px;
+  height: 10px;
   background: var(--light);
   border-radius: 999px;
   overflow: hidden;
@@ -424,26 +492,36 @@ body {
   transition: width 0.4s ease;
 }
 
+.era-bar-fill-top {
+  background: var(--navy);
+}
+
 .era-score {
+  width: 48px;
+  text-align: right;
   font-family: 'Gaegu', cursive;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--blue);
   flex-shrink: 0;
 }
 
 .back-btn {
+  display: block;
+  text-decoration: none;
+  text-align: center;
   font-family: 'Gaegu', cursive;
   font-size: 1.1rem;
   color: var(--blue);
-  background: none;
+  background: rgba(255,255,255,0.6);
   border: 1.5px dashed var(--blue);
   border-radius: 16px;
-  padding: 16px 24px;
+  padding: 14px 24px;
   cursor: pointer;
   width: 100%;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .back-btn:hover {
   background: rgba(255,255,255,0.9);
+  color: var(--navy);
 }
