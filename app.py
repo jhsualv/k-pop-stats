@@ -20,6 +20,11 @@ def home():
     if not user_id:
         return redirect("/login")
 
+    time_range = request.args.get("time_range", "short_term")
+
+    if time_range not in ("short_term", "medium_term", "long_term"):
+        time_range = "short_term"
+
     with get_connection() as conn:
         analysis = get_user_analysis(user_id, conn)
         profile = get_user(user_id, conn)
@@ -28,6 +33,7 @@ def home():
         "index.html",
         analysis=analysis,
         profile=profile,
+        time_range=time_range,
     )
 
 @app.route("/ingest/listening")

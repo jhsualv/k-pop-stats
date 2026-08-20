@@ -16,6 +16,7 @@
 
 <body>
 
+{% set current = analysis[time_range] %}
   <div class="halftone-bg"></div>
 
   <div id="app">
@@ -44,8 +45,8 @@
           <div class="stat-row">
             <span class="stat-label">top group</span>
             <span class="stat-value">
-              {{ analysis.short_term.top_group.group_name
-                 if analysis.short_term.top_group
+              {{ current.top_group.group_name
+                 if current.top_group
                  else "—" }}
             </span>
           </div>
@@ -53,9 +54,9 @@
           <div class="stat-row">
             <span class="stat-label">favorite era</span>
             <span class="stat-value">
-              {{ analysis.short_term.top_group.top_era.era
-                 if analysis.short_term.top_group
-                 and analysis.short_term.top_group.top_era
+              {{ current.top_group.top_era.era
+                 if current.top_group
+                 and current.top_group.top_era
                  else "—" }}
             </span>
           </div>
@@ -63,9 +64,9 @@
           <div class="stat-row">
             <span class="stat-label">favorite track</span>
             <span class="stat-value">
-              {{ analysis.short_term.top_group.top_track.name
-                 if analysis.short_term.top_group
-                 and analysis.short_term.top_group.top_track
+              {{ current.top_group.top_track.name
+                 if current.top_group
+                 and current.top_group.top_track
                  else "—" }}
             </span>
           </div>
@@ -73,13 +74,21 @@
           <div class="stat-row">
             <span class="stat-label">groups found</span>
             <span class="stat-value">
-              {{ analysis.short_term.groups|length }}
+              {{ current.groups|length }}
             </span>
           </div>
 
           <div class="stat-row">
             <span class="stat-label">time range</span>
-            <span class="stat-value">4 weeks</span>
+            <span class="stat-value">
+                {% if time_range == "short_term" %}
+                    4 weeks
+                {% elif time_range == "medium_term" %}
+                    6 months
+                {% else %}
+                    1 year
+                {% endif %}
+            </span>
           </div>
 
         </div>
@@ -92,17 +101,26 @@
         <div class="controls">
           <div class="tab-group">
 
-            <button class="tab active">
-              4 weeks
-            </button>
+            <a
+                href="{{ url_for('home', time_range='short_term') }}"
+                class="tab {% if time_range == 'short_term' %}active{% endif %}"
+            >
+            4 weeks
+            </a>
 
-            <button class="tab">
-              6 months
-            </button>
+            <a
+                href="{{ url_for('home', time_range='medium_term') }}"
+                class="tab {% if time_range == 'medium_term' %}active{% endif %}"
+            >
+            6 months
+            </a>
 
-            <button class="tab">
-              all time
-            </button>
+            <a
+                href="{{ url_for('home', time_range='long_term') }}"
+                class="tab {% if time_range == 'long_term' %}active{% endif %}"
+            >
+            1 year
+            </a>
 
           </div>
         </div>
@@ -110,9 +128,9 @@
         <!-- Group cards -->
         <div id="group-cards">
 
-          {% if analysis.short_term.groups %}
+          {% if current.groups %}
 
-            {% for group in analysis.short_term.top_groups %}
+            {% for group in current.groups %}
 
               <div class="group-card">
 

@@ -164,6 +164,8 @@ body {
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+  display: inline-block;
+  text-decoration: none;
 }
 
 .tab.active {
